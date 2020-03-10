@@ -16,6 +16,7 @@ import cjwparquet
 import pyarrow
 from cjwmodule.http import httpfile
 from cjwmodule.i18n import I18nMessage
+from cjwmodule.testing.i18n import cjwmodule_i18n_message, i18n_message
 
 from .. import loadurl
 
@@ -238,10 +239,9 @@ class FetchTests(unittest.TestCase):
                 result.errors,
                 [
                     RenderError(
-                        I18nMessage(
+                        cjwmodule_i18n_message(
                             "http.errors.HttpErrorNotSuccess",
                             {"status_code": 404, "reason": "Not Found"},
-                            "cjwmodule",
                         )
                     )
                 ],
@@ -254,7 +254,7 @@ class FetchTests(unittest.TestCase):
                 result.errors,
                 [
                     RenderError(
-                        I18nMessage("http.errors.HttpErrorInvalidUrl", {}, "cjwmodule")
+                        cjwmodule_i18n_message("http.errors.HttpErrorInvalidUrl")
                     )
                 ],
             )
@@ -294,9 +294,7 @@ class FetchTests(unittest.TestCase):
                 result.errors,
                 [
                     RenderError(
-                        I18nMessage(
-                            "http.errors.HttpErrorTooManyRedirects", {}, "cjwmodule"
-                        )
+                        cjwmodule_i18n_message("http.errors.HttpErrorTooManyRedirects")
                     )
                 ],
             )
@@ -344,16 +342,7 @@ class RenderTests(unittest.TestCase):
             table, errors = call_render(P(has_header=False), FetchResult(fetched_path))
             assert_arrow_table_equals(table, {"A": [1, 2], "B": [3, 4]})
             self.assertEqual(
-                errors,
-                [
-                    I18nMessage(
-                        "TODO_i18n",
-                        {
-                            "text": "Please re-download this file to disable header-row handling"
-                        },
-                        None,
-                    )
-                ],
+                errors, [i18n_message("prompt.disableHeaderHandling",)],
             )
 
     def test_render_has_header_true(self):

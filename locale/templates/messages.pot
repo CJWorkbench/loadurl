@@ -18,3 +18,13 @@ msgstr ""
 msgid "_spec.parameters.version_select.name"
 msgstr ""
 
+#. default-message: Please re-download this file to disable header-row handling
+#: loadurl.py:109
+msgid "prompt.disableHeaderHandling"
+msgstr ""
+
+#. default-message: Server responded with unhandled Content-Type {content_type}. Please use a different URL.
+#: loadurl.py:125
+msgid "error.unhandledContentType"
+msgstr ""
+
