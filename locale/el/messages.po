@@ -38,9 +38,9 @@ msgstr "Ενημέρωση"
 
 #: loadurl.py:109
 msgid "prompt.disableHeaderHandling"
-msgstr ""
+msgstr "Κάντε λήψη αυτού του αρχείου εκ νέου για να απενεργοποιήσετε τον χειρισμό της γραμμής κεφαλίδας"
 
 #: loadurl.py:125
 msgid "error.unhandledContentType"
-msgstr ""
+msgstr "Ο διακομιστής απάντησε με άκυρο τύπο περιεχομένου {content_type}. Χρησιμοποιήστε διαφορετική διεύθυνση URL."
 
