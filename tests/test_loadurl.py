@@ -400,10 +400,49 @@ class RenderTests(unittest.TestCase):
                 # bytes will prove we used "csv" explicitly -- we didn't
                 # take "text/plain" and decide to use a CSV sniffer to
                 # find the delimiter.
-                io.BytesIO(b"A;B\na;b"),
+                io.BytesIO(b"A;B;C,D\na;b;c,d"),
             )
             table, errors = call_render(P(has_header=True), FetchResult(http_path))
-            assert_arrow_table_equals(table, {"A;B": ["a;b"]})
+            assert_arrow_table_equals(table, {"A;B;C": ["a;b;c"], "D": ["d"]})
+            self.assertEqual(errors, [])
+
+    def test_render_csv_use_content_disposition_given_bad_content_type(self):
+        with tempfile_context(prefix="fetch-") as http_path:
+            httpfile.write(
+                http_path,
+                {"url": "http://example.com/file"},
+                "200 OK",
+                [
+                    ("content-type", "application/octet-stream"),
+                    (
+                        "content-disposition",
+                        'attachment; filename="file.csv"; size=4405',
+                    ),
+                ],
+                # bytes will prove we used "file.csv", not a sniffer.
+                io.BytesIO(b"A;B;C,D\na;b;c,d"),
+            )
+            table, errors = call_render(P(has_header=True), FetchResult(http_path))
+            assert_arrow_table_equals(table, {"A;B;C": ["a;b;c"], "D": ["d"]})
+            self.assertEqual(errors, [])
+
+    def test_render_prefer_content_disposition_to_url_ext(self):
+        # When content-disposition uses a different name, prefer that name.
+        with tempfile_context(prefix="fetch-") as http_path:
+            httpfile.write(
+                http_path,
+                {"url": "http://example.com/file.csv"},
+                "200 OK",
+                [
+                    # Wrong MIME type -- so we detect from filename
+                    ("content-type", "application/octet-stream"),
+                    ("content-disposition", 'attachment; filename="file.tsv"',),
+                ],
+                # bytes will prove we used "file.tsv", not "file.csv".
+                io.BytesIO(b"A,B\tC,D\na,b\tc,d"),
+            )
+            table, errors = call_render(P(has_header=True), FetchResult(http_path))
+            assert_arrow_table_equals(table, {"A,B": ["a,b"], "C,D": ["c,d"]})
             self.assertEqual(errors, [])
 
     def test_render_text_plain(self):
