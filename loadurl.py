@@ -29,7 +29,7 @@ from typing import Any, Dict, List, Optional
 
 import cjwparquet
 from cjwmodule.http import HttpError, httpfile
-from cjwmodule.i18n import I18nMessage
+from cjwmodule.i18n import I18nMessage, trans
 from cjwparse.api import MimeType, parse_file
 
 ExtensionMimeTypes = {
@@ -129,10 +129,9 @@ def _render_deprecated_parquet(
         # was broken by design (what about types???) and it was rarely used.
         # Let's not maintain it any longer.
         errors += [
-            I18nMessage(
-                "TODO_i18n",
-                {"text": "Please re-download this file to disable header-row handling"},
-                None,
+            trans(
+                "prompt.disableHeaderHandling",
+                "Please re-download this file to disable header-row handling",
             )
         ]
 
@@ -151,16 +150,11 @@ def _render_file(path: Path, output_path: Path, params: Dict[str, Any]):
         )
         if not mime_type:
             return [
-                (
-                    "TODO_i18n",
-                    {
-                        "text": (
-                            "Server responded with unhandled Content-Type %r. "
-                            "Please use a different URL."
-                        )
-                        % content_type
-                    },
-                    None,
+                trans(
+                    "error.unhandledContentType",
+                    "Server responded with unhandled Content-Type {content_type}. "
+                    "Please use a different URL.",
+                    {"content_type": content_type},
                 )
             ]
         maybe_charset = guess_charset_or_none(content_type)
